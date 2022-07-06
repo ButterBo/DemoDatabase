@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -16,9 +17,12 @@ public class MainActivity extends AppCompatActivity {
 
     Button btnInsert, btnGetTasks;
     TextView tvResults;
-    ListView ListToDo;
-    ArrayList<String> al;
-    ArrayAdapter<String> aa;
+    ListView lv;
+    ArrayList<Task> al;
+    ArrayAdapter aa;
+    EditText etTask, etDate;
+    //boolean asc = true;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,10 +32,9 @@ public class MainActivity extends AppCompatActivity {
         btnInsert = findViewById(R.id.buttonInsert);
         btnGetTasks = findViewById(R.id.btnGetTasks);
         tvResults = findViewById(R.id.tvResults);
-        ListToDo = findViewById(R.id.lv);
-        al = new ArrayList<String>();
-        aa = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, al);
-        ListToDo.setAdapter(aa);
+        lv = findViewById(R.id.lv);
+        etTask = findViewById(R.id.editTextTask);
+        etDate = findViewById(R.id.editTextDate);
 
         btnInsert.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -41,8 +44,9 @@ public class MainActivity extends AppCompatActivity {
                 DBHelper db = new DBHelper(MainActivity.this);
 
                 // Insert a task
-                db.insertTask("Submit RJ", "25 Apr 2021");
-
+                //db.insertTask("Submit RJ", "25 Apr 2021");
+                db.insertTask(etTask.getText().toString(),etDate.getText().toString());
+                db.close();
             }
         });
 
@@ -52,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
                 // Create the DBHelper object, passing in the
                 // activity's Context
                 DBHelper db = new DBHelper(MainActivity.this);
-                
+
                 // Insert a task
                 ArrayList<String> data = db.getTaskContent();
                 db.close();
@@ -63,6 +67,13 @@ public class MainActivity extends AppCompatActivity {
                     txt += i + ". " + data.get(i) + "\n";
                 }
                 tvResults.setText(txt);
+
+                DBHelper db2 = new DBHelper(MainActivity.this);
+                al = db2.getTasks();
+                db2.close();
+
+                aa =new ArrayAdapter(MainActivity.this,android.R.layout.simple_list_item_1,al);
+                lv.setAdapter(aa);
             }
         });
 
